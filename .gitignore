@@ -1,6 +1,10 @@
 # Build and Release Folders
 bin-debug/
 bin-release/
+robot/Framework
+robot/Data
+robot/Linux
+robot/server
 [Oo]bj/
 [Bb]in/
 
