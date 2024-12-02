@@ -5,8 +5,11 @@ robot/Framework
 robot/Data
 robot/Linux
 robot/server
+audio/libsoundio-master
+action/www
 [Oo]bj/
 [Bb]in/
+action/action_script
 
 # Other files and folders
 .settings/
