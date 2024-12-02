@@ -8,6 +8,10 @@ bin-release/
 .settings/
 
 # Executables
+*.o
+*.asc
+*.txt
+*.ini
 *.swf
 *.air
 *.ipa
