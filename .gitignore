@@ -6,7 +6,7 @@ robot/Data
 robot/Linux
 robot/server
 audio/libsoundio-master
-action/www
+action/www/
 [Oo]bj/
 [Bb]in/
 action/action_script
@@ -23,9 +23,9 @@ action/action_script
 *.air
 *.ipa
 *.apk
-.js
-.ico
-.html
+*.js
+*.ico
+*.html
 
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
 # should NOT be excluded as they contain compiler settings and other important
