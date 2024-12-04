@@ -378,7 +378,7 @@ int main()
 		{
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
 			strcpy(buffer_tmp, buffer);
-			n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr,&len); 
+			n = read(sockfd, (char *)buffer, MAXLINE); 
 			buffer[n] = '\0';
 			printf("Client : %s\n", buffer);
 			if(strcmp(buffer,"action") == 0){cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);}
@@ -397,7 +397,7 @@ int main()
 		else if(strcmp(buffer,"vision") == 0)
 		{	
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
-			n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr,&len); 
+			n = read(sockfd, (char *)buffer, MAXLINE); 
 			buffer[n] = '\0';
 			strcpy(buffer_tmp, buffer);
 			printf("Client : %s\n", buffer_tmp);
@@ -417,7 +417,7 @@ int main()
 		else if(strcmp(buffer,"soccer") == 0)
 		{
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
-			n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr,&len); 
+			n = read(sockfd, (char *)buffer, MAXLINE); 
 			buffer[n] = '\0';
 			strcpy(buffer_tmp, buffer);
 			printf("Client : %s\n", buffer_tmp);
@@ -447,7 +447,7 @@ int main()
 		{	
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
 			strcpy(buffer_tmp, buffer);
-			//n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr,&len); 
+			n = read(sockfd, (char *)buffer, MAXLINE); 
 			buffer[n] = '\0';
 			printf("Client : %s\n", buffer);
 			std::string line = buffer;
