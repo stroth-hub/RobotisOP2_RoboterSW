@@ -441,7 +441,7 @@ int main()
 		}
 		else if(strcmp(buffer,"no_cmd") == 0)
 		{
-			printf("No Command")
+			printf("No Command");
 		}
 		else
 		{	
