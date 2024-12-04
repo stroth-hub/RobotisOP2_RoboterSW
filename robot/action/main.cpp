@@ -369,12 +369,7 @@ int main()
 	cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);
 	while(1)
 	{
-		while(1)
-		{
-			send(sockfd, "req_new", strlen("req_new"),0);
-			read(sockfd, (char *)buffer, MAXLINE);
-			printf("Client : %s\n", buffer);
-		}
+		send(sockfd, "req_new", strlen("cmd_req"),0);
 		n = read(sockfd, (char *)buffer, MAXLINE);    		
 		//n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr,&len); 
 		buffer[n] = '\0';
@@ -444,11 +439,15 @@ int main()
 					
 			}
 		}
+		else if(strcmp(buffer,"no_cmd") == 0)
+		{
+			printf("No Command")
+		}
 		else
 		{	
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
 			strcpy(buffer_tmp, buffer);
-			n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr,&len); 
+			#n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr,&len); 
 			buffer[n] = '\0';
 			printf("Client : %s\n", buffer);
 			std::string line = buffer;
