@@ -373,7 +373,7 @@ int main()
 		n = read(sockfd, (char *)buffer, MAXLINE);    		
 		//n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr,&len); 
 		buffer[n] = '\0';
-		printf("Client : %s\n", buffer);
+		//printf("Client : %s\n", buffer);
 		if(strcmp(buffer,"wait") == 0)
 		{
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
@@ -441,7 +441,7 @@ int main()
 		}
 		else if(strcmp(buffer,"no_cmd") == 0)
 		{
-			printf("No Command");
+			//printf("No Command");
 		}
 		else
 		{	
