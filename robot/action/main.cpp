@@ -432,7 +432,7 @@ int main()
 				if(StatusCheck::m_soccer_sub_mode == SOCCER_END)
 				{
 					//printf("Soccer Ende \n");
-					if(Scan(&cm730)==20)cm730.Connect();
+					//if(Scan(&cm730)==20)cm730.Connect();
 					cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);
 					break;
 				}
@@ -442,10 +442,11 @@ int main()
 		else if(strcmp(buffer,"no_cmd") == 0)
 		{
 			//printf("No Command");
-			if(Scan(&cm730)==20)
+			if(CM730::Ping(200)!=0)
 			{
 				cm730.Connect();
 				Action::GetInstance()->Start(1);
+				while(Action::GetInstance()->IsRunning()) usleep(8*1000);
 			}
 		}
 		else
