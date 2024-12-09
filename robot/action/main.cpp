@@ -446,7 +446,7 @@ int main()
 			//printf("No Command");
 			if(CM730::Ping(200,int_err)!=0)
 			{
-				print(int_err)
+				printf(int_err);
 				cm730.Connect();
 				Action::GetInstance()->Start(1);
 				while(Action::GetInstance()->IsRunning()) usleep(8*1000);
