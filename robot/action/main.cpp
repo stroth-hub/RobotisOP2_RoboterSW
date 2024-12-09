@@ -442,6 +442,11 @@ int main()
 		else if(strcmp(buffer,"no_cmd") == 0)
 		{
 			//printf("No Command");
+			if(Scan(&cm730)==20)
+			{
+				cm730.Connect();
+				Action::GetInstance()->Start(1);
+			}
 		}
 		else
 		{	
@@ -456,14 +461,6 @@ int main()
 			usleep(1000);
 			std::system(("espeak -vde "+line).c_str());
 			while(Action::GetInstance()->IsRunning()) usleep(8*1000);
-			//int time = 0;
-			//while(Action::GetInstance()->IsRunning()) 
-			//{
-			//	usleep(8*1000);
-			//	time = time+8;
-			//	printf("%d\n",time);
-			//}
-			if(Scan(&cm730)==20)cm730.Connect();
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);
 		}	    		  
 	}
