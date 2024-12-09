@@ -444,7 +444,7 @@ int main()
 		else if(strcmp(buffer,"no_cmd") == 0)
 		{
 			//printf("No Command");
-			(cm730.CM730::Ping(200,int_err)
+			cm730.CM730::Ping(200,int_err);
 			if(*int_err!=0)
 			{
 				//printf(*int_err);
