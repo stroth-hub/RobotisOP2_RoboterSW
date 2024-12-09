@@ -351,7 +351,7 @@ int main()
 
 	httpd::ini = ini;
 
-	int* = int_err;
+	int* int_err;
 	while(Scan(&cm730)!=0)
 	{
 		if(Scan(&cm730)==20)
