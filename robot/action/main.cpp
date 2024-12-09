@@ -350,6 +350,8 @@ int main()
     	httpd::blue_finder = blue_finder;
 
 	httpd::ini = ini;
+
+	int* = int_err;
 	while(Scan(&cm730)!=0)
 	{
 		if(Scan(&cm730)==20)
@@ -442,8 +444,9 @@ int main()
 		else if(strcmp(buffer,"no_cmd") == 0)
 		{
 			//printf("No Command");
-			if(CM730::Ping(200)!=0)
+			if(CM730::Ping(200,int_err)!=0)
 			{
+				print(int_err)
 				cm730.Connect();
 				Action::GetInstance()->Start(1);
 				while(Action::GetInstance()->IsRunning()) usleep(8*1000);
