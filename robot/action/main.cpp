@@ -447,9 +447,8 @@ int main()
 			if(Scan(&cm730)==20)
 			{
 				printf("cm730 Disconnected \n");
-				MotionManager::GetInstance()->SetEnable(false);
+				MotionManager::GetInstance()->Reinitialize();
 				cm730.Connect();
-				MotionManager::GetInstance()->SetEnable(true);
 				//Action::GetInstance()->Start(1);
 				//while(Action::GetInstance()->IsRunning()) usleep(8*1000);
 			}
