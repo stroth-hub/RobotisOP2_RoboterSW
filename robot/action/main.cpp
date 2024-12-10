@@ -450,6 +450,7 @@ int main()
 				cm730.Connect();
 				Scan(&cm730);
 			}
+			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);
 		}
 		else
 		{	
