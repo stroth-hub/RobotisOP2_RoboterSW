@@ -62,8 +62,6 @@ void change_current_dir()
 }
 void sighandler(int sig)
 {
-    close(sockfd);
-    cm730.Disconnect();
     exit(0);
 }
 void vision(ColorFinder* ball_finder, ColorFinder* red_finder, ColorFinder* blue_finder, ColorFinder* yellow_finder, Image* rgb_output, int& detected_color)
