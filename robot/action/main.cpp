@@ -65,7 +65,6 @@ void change_current_dir()
 void sighandler(int sig)
 {
     cleanup = 1;
-    sleep(3);
     exit(0);
 }
 void vision(ColorFinder* ball_finder, ColorFinder* red_finder, ColorFinder* blue_finder, ColorFinder* yellow_finder, Image* rgb_output, int& detected_color)
@@ -385,7 +384,7 @@ int main()
 			printf("Cleanup\n");
 			send(sockfd, "clean_up", strlen("clean_up"),0);
 			close(sockfd);
-			//exit(0);
+			exit(0);
 		}
 		else if(strcmp(buffer,"close") == 0)
 		{
@@ -449,19 +448,8 @@ int main()
 			{
 				printf("cm730 Disconnected \n");
 				cm730.Connect();
-				MotionManager::GetInstance()->Reinitialize();
-				Walking::GetInstance()->LoadINISettings(ini);
-				MotionManager::GetInstance()->LoadINISettings(ini);
-				MotionManager::GetInstance()->AddModule((MotionModule*)Action::GetInstance());
-				MotionManager::GetInstance()->AddModule((MotionModule*)Head::GetInstance());
-        			MotionManager::GetInstance()->AddModule((MotionModule*)Walking::GetInstance());
-				motion_timer->Start();
-				MotionManager::GetInstance()->SetEnable(true);
-				Action::GetInstance()->m_Joint.SetEnableBody(true, true);
-				//Scan(&cm730);
-				Action::GetInstance()->m_Joint.SetEnableBody(true, true);
-				Action::GetInstance()->Start(1);
-				while(Action::GetInstance()->IsRunning()) usleep(8*1000);
+				//Action::GetInstance()->Start(1);
+				//while(Action::GetInstance()->IsRunning()) usleep(8*1000);
 			}
 		}
 		else
