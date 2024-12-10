@@ -54,6 +54,8 @@
 
 int gID = CM730::ID_CM;
 
+int cleanup = 0;
+
 void change_current_dir()
 {
     char exepath[1024] = {0};
@@ -62,7 +64,7 @@ void change_current_dir()
 }
 void sighandler(int sig)
 {
-    exit(0);
+    cleanup = 1;
 }
 void vision(ColorFinder* ball_finder, ColorFinder* red_finder, ColorFinder* blue_finder, ColorFinder* yellow_finder, Image* rgb_output, int& detected_color)
 {
@@ -376,14 +378,10 @@ int main()
 		//n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr,&len); 
 		buffer[n] = '\0';
 		//printf("Client : %s\n", buffer);
-		if(strcmp(buffer,"wait") == 0)
+		if(cleanup != 0)
 		{
-			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
-			strcpy(buffer_tmp, buffer);
-			n = read(sockfd, (char *)buffer, MAXLINE); 
-			buffer[n] = '\0';
-			printf("Client : %s\n", buffer);
-			if(strcmp(buffer,"action") == 0){cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);}
+			close(sockfd);
+			exit(0);
 		}
 		else if(strcmp(buffer,"close") == 0)
 		{
