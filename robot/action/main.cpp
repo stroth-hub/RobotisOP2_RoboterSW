@@ -443,14 +443,9 @@ int main()
 		}
 		else if(strcmp(buffer,"no_cmd") == 0)
 		{
-			//printf("No Command");
-			for(int id=1; id<254; id++)
+			if(Scan(&cm730)==20)
 			{
-				Dump(&cm730,id);	
-			}
-			if(cm730.Ping(CM730::ID_CM,0) != CM730::SUCCESS)
-			{
-				//printf(*int_err);
+				printf("cm730 Disconnected \n");
 				cm730.Connect();
 				Action::GetInstance()->Start(1);
 				while(Action::GetInstance()->IsRunning()) usleep(8*1000);
