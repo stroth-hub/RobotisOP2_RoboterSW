@@ -449,6 +449,15 @@ int main()
 			{
 				printf("cm730 Disconnected \n");
 				cm730.Connect();
+				MotionManager::GetInstance()->Reinitialize();
+				Walking::GetInstance()->LoadINISettings(ini);
+				MotionManager::GetInstance()->LoadINISettings(ini);
+				MotionManager::GetInstance()->AddModule((MotionModule*)Action::GetInstance());
+				MotionManager::GetInstance()->AddModule((MotionModule*)Head::GetInstance());
+        			MotionManager::GetInstance()->AddModule((MotionModule*)Walking::GetInstance());
+				motion_timer->Start();
+				MotionManager::GetInstance()->SetEnable(true);
+				Action::GetInstance()->m_Joint.SetEnableBody(true, true);
 				//Scan(&cm730);
 				Action::GetInstance()->m_Joint.SetEnableBody(true, true);
 				Action::GetInstance()->Start(1);
