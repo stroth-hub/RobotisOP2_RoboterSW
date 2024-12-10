@@ -444,6 +444,10 @@ int main()
 		else if(strcmp(buffer,"no_cmd") == 0)
 		{
 			//printf("No Command");
+			for(int id=1; id<254; id++)
+			{
+				cm730.Dump(id);	
+			}
 			if(cm730.Ping(CM730::ID_CM,0) != CM730::SUCCESS)
 			{
 				//printf(*int_err);
