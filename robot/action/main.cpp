@@ -216,7 +216,7 @@ void soccer(ColorFinder* ball_finder, BallTracker& tracker, mjpg_streamer* strea
 
 int main()
 {
-	printf("Init Main");
+	printf("Init Main\n");
 	signal(SIGABRT, &sighandler);
     	signal(SIGTERM, &sighandler);
     	signal(SIGQUIT, &sighandler);
@@ -447,7 +447,8 @@ int main()
 			{
 				printf("cm730 Disconnected \n");
 				cm730.Connect();
-				Scan(&cm730);
+				usleep(8*1000);
+				//Scan(&cm730);
 				Action::GetInstance()->Start(1);
 				while(Action::GetInstance()->IsRunning()) usleep(8*1000);
 			}
