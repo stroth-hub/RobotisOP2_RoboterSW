@@ -380,7 +380,8 @@ int main()
 		//printf("Client : %s\n", buffer);
 		if(cleanup != 0)
 		{
-			send(sockfd, "clean_up", strlen("cmd_req"),0);
+			printf("Cleanup\n");
+			send(sockfd, "clean_up", strlen("clean_up"),0);
 			close(sockfd);
 			exit(0);
 		}
@@ -445,8 +446,7 @@ int main()
 			if(Scan(&cm730)==20)
 			{
 				printf("cm730 Disconnected \n");
-				cm730.Connect();
-				MotionManager::GetInstance()->Reinitialize();
+				MotionManager::GetInstance()->Initialize(&cm730)
 				usleep(8*1000);
 				//Scan(&cm730);
 				Action::GetInstance()->Start(1);
