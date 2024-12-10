@@ -99,7 +99,7 @@ void Help()
 
 int Scan(CM730 *cm730)
 {
-	printf("Scanning...\n");
+	//printf("Scanning...\n");
 	int fail_cnt = 0;
 	for(int id=1; id<254; id++)
 	{
@@ -114,7 +114,7 @@ int Scan(CM730 *cm730)
             //printf(" Check ID:%d(%s)\n", id, GetIDString(id));
 	    fail_cnt++; 
 	    if(id == CM730::ID_CM)return id;
-	    Reset(cm730, id);
+	    //Reset(cm730, id);
         }
 	}
 	return fail_cnt;
@@ -278,11 +278,11 @@ void Reset(Robot::CM730 *cm730, int id)
 {
 	int FailCount = 0;
 	int FailMaxCount = 10;
-	printf(" Reset ID:%d...", id);
+	//printf(" Reset ID:%d...", id);
 
 	if(cm730->Ping(id, 0) != CM730::SUCCESS)
 	{
-		printf("Fail\n");
+		//printf("Fail\n");
 		return;
 	}
 
@@ -295,7 +295,7 @@ void Reset(Robot::CM730 *cm730, int id)
 		FailCount++;
 		if(FailCount > FailMaxCount)
 		{
-			printf("Fail\n");
+			//printf("Fail\n");
 			return;
 		}
 		usleep(10000);
@@ -310,7 +310,7 @@ void Reset(Robot::CM730 *cm730, int id)
 		FailCount++;
 		if(FailCount > FailMaxCount)
 		{
-			printf("Fail\n");
+			//printf("Fail\n");
 			return;
 		}
 		usleep(10000);
