@@ -380,6 +380,7 @@ int main()
 		//printf("Client : %s\n", buffer);
 		if(cleanup != 0)
 		{
+			send(sockfd, "clean_up", strlen("cmd_req"),0);
 			close(sockfd);
 			exit(0);
 		}
