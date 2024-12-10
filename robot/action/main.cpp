@@ -447,6 +447,7 @@ int main()
 			{
 				printf("cm730 Disconnected \n");
 				cm730.Connect();
+				Scan(&cm730);
 				Action::GetInstance()->Start(1);
 				while(Action::GetInstance()->IsRunning()) usleep(8*1000);
 			}
