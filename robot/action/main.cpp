@@ -446,7 +446,7 @@ int main()
 			//printf("No Command");
 			for(int id=1; id<254; id++)
 			{
-				cm730.Dump(id);	
+				Dump(&cm730,id);	
 			}
 			if(cm730.Ping(CM730::ID_CM,0) != CM730::SUCCESS)
 			{
