@@ -99,26 +99,25 @@ void Help()
 
 int Scan(CM730 *cm730)
 {
-	printf("\n");
+	printf("Scanning...\n");
 	int fail_cnt = 0;
 	for(int id=1; id<254; id++)
 	{
         if(cm730->Ping(id, 0) == CM730::SUCCESS)
         {
-            printf("                                  ... OK\r");
-            printf(" Check ID:%d(%s)\n", id, GetIDString(id));
+            //printf("                                  ... OK\r");
+            //printf(" Check ID:%d(%s)\n", id, GetIDString(id));
         }
         else if(id < JointData::NUMBER_OF_JOINTS || id == CM730::ID_CM)
         {
-            printf("                                  ... FAIL\r");
-            printf(" Check ID:%d(%s)\n", id, GetIDString(id));
+            //printf("                                  ... FAIL\r");
+            //printf(" Check ID:%d(%s)\n", id, GetIDString(id));
 	    fail_cnt++; 
 	    if(id == CM730::ID_CM)return id;
 	    Reset(cm730, id);
         }
 	}
 	return fail_cnt;
-	printf("\n");
 }
 
 void Dump(CM730 *cm730, int id)
