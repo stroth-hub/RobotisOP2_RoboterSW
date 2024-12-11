@@ -192,14 +192,14 @@ void soccer(ColorFinder* ball_finder, BallTracker& tracker, mjpg_streamer* strea
                         		if(follower.KickBall == -1)
                         		{
                             			Action::GetInstance()->Start(12);   // RIGHT KICK
-						while(Action::GetInstance()->IsRunning() == true) usleep(8000);
-                            			fprintf(stderr, "RightKick! \n");
+						//while(Action::GetInstance()->IsRunning() == true) usleep(8000);
+                            			//fprintf(stderr, "RightKick! \n");
 			                }
                         		else if(follower.KickBall == 1)
                         		{
                             			Action::GetInstance()->Start(13);   // LEFT KICK
-						while(Action::GetInstance()->IsRunning() == true) usleep(8000);
-                           			fprintf(stderr, "LeftKick! \n");
+						//while(Action::GetInstance()->IsRunning() == true) usleep(8000);
+                           			//fprintf(stderr, "LeftKick! \n");
                         		}
                 		}
                 	}
