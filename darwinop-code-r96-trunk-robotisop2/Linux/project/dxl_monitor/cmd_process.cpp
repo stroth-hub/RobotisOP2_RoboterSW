@@ -97,33 +97,25 @@ void Help()
 	printf( "\n       Copyright ROBOTIS CO.,LTD.\n\n" );
 }
 
-int Scan(CM730 *cm730)
+void Scan(CM730 *cm730)
 {
-	if(cm730->Ping(200, 0) == CM730::SUCCESS){return 1;}
-	else{return 0;}
-	//printf("Scanning...\n");
-	//int success_cnt = 0;
-	//int fail_cnt = 0;
-	//for(int id=1; id<254; id++)
-	//{
-        //if(cm730->Ping(id, 0) == CM730::SUCCESS)
-        //{
-	//	success_cnt++;
-        //    printf("                                  ... OK\r");
-        //    printf(" Check ID:%d(%s)\n", id, GetIDString(id));
-        //}
-	//else if(success_cnt < 15){return success_cnt;}	
-	//else if(id < JointData::NUMBER_OF_JOINTS || id == CM730::ID_CM){fail_cnt++;}
-        //else if(id < JointData::NUMBER_OF_JOINTS || id == CM730::ID_CM)
-        //{
-        //    printf("                                  ... FAIL\r");
-        //    printf(" Check ID:%d(%s)\n", id, GetIDString(id));
-	//    fail_cnt++; 
-	//    if(id == CM730::ID_CM)return id;
-	//    Reset(cm730, id);
-        //}
-	//}
-	//return success_cnt;
+	printf("\n");
+
+	for(int id=1; id<254; id++)
+	{
+        if(cm730->Ping(id, 0) == CM730::SUCCESS)
+        {
+            printf("                                  ... OK\r");
+            printf(" Check ID:%d(%s)\n", id, GetIDString(id));
+        }
+        else if(id < JointData::NUMBER_OF_JOINTS || id == CM730::ID_CM)
+        {
+            printf("                                  ... FAIL\r");
+            printf(" Check ID:%d(%s)\n", id, GetIDString(id));
+        }
+	}
+
+	printf("\n");
 }
 
 void Dump(CM730 *cm730, int id)
@@ -284,11 +276,11 @@ void Reset(Robot::CM730 *cm730, int id)
 {
 	int FailCount = 0;
 	int FailMaxCount = 10;
-	//printf(" Reset ID:%d...", id);
+	printf(" Reset ID:%d...", id);
 
 	if(cm730->Ping(id, 0) != CM730::SUCCESS)
 	{
-		//printf("Fail\n");
+		printf("Fail\n");
 		return;
 	}
 
@@ -301,7 +293,7 @@ void Reset(Robot::CM730 *cm730, int id)
 		FailCount++;
 		if(FailCount > FailMaxCount)
 		{
-			//printf("Fail\n");
+			printf("Fail\n");
 			return;
 		}
 		usleep(10000);
@@ -316,7 +308,7 @@ void Reset(Robot::CM730 *cm730, int id)
 		FailCount++;
 		if(FailCount > FailMaxCount)
 		{
-			//printf("Fail\n");
+			printf("Fail\n");
 			return;
 		}
 		usleep(10000);

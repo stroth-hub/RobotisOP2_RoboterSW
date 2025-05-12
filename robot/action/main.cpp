@@ -60,6 +60,7 @@ void change_current_dir()
 {
     char exepath[1024] = {0};
     if(readlink("/proc/self/exe", exepath, sizeof(exepath)) != -1)
+	printf(exepath);
         chdir(dirname(exepath));
 }
 void sighandler(int sig)
@@ -220,25 +221,32 @@ void soccer(ColorFinder* ball_finder, BallTracker& tracker, mjpg_streamer* strea
 int main()
 {
 	printf("Init Main\n");
-	signal(SIGABRT, &sighandler);
-    	signal(SIGTERM, &sighandler);
-    	signal(SIGQUIT, &sighandler);
-    	signal(SIGINT, &sighandler);
+	//signal(SIGABRT, &sighandler);
+    	//signal(SIGTERM, &sighandler);
+    	//signal(SIGQUIT, &sighandler);
+    	//signal(SIGINT, &sighandler);
 
 	printf("TCP Init\n");
    	int sockfd; 
     	char buffer[MAXLINE]; 
-	char buffer_tmp[MAXLINE];
+	memset(buffer,0,MAXLINE);
+	//std::string buffer;
+	char buffer_tmp[MAXLINE];	
+	memset(buffer_tmp,0,MAXLINE);
     	struct sockaddr_in servaddr, cliaddr; 
     	cliaddr.sin_addr.s_addr = inet_addr("192.168.137.85");
        
+	// TCP
     	// Creating socket file descriptor 
     	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0 ) 
 	{ 
         	perror("socket creation failed\n"); 
         	exit(EXIT_FAILURE); 
 	}
-       
+    
+	// UDP
+	//sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+   
     	memset(&servaddr, 0, sizeof(servaddr)); 
     	memset(&cliaddr, 0, sizeof(cliaddr)); 
        
@@ -248,24 +256,25 @@ int main()
     	servaddr.sin_port = htons(PORT); 
        
     	//Bind the socket with the server address 
-    	//if ( bind(sockfd, (const struct sockaddr *)&servaddr,  
-        //    sizeof(servaddr)) < 0 ) 
-    	//{ 
-        //	perror("bind failed\n"); 
-        //	exit(EXIT_FAILURE); 
-    	//}       
+    	if ( bind(sockfd, (const struct sockaddr *)&cliaddr,  
+            sizeof(servaddr)) < 0 ) 
+    	{ 
+        	perror("bind failed\n"); 
+        	exit(EXIT_FAILURE); 
+    	}       
     	socklen_t len;
     	int n;   
-    	len = sizeof(cliaddr);  //len is value/result 
+    	len = sizeof(servaddr);  //len is value/result 
 	
 	if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
 	{
 		printf("Connection Failed\n");
 	}
 	printf("Connection Success\n");
-
-
-			
+	send(sockfd, "req_new", strlen("req_new"),0);
+	sleep(0.5);
+	n = read(sockfd, (char *)buffer, MAXLINE);
+	printf("Server : %s\n", buffer);	
 	
 	printf("Framework Init\n");
     	minIni* ini = new minIni(INI_FILE_PATH);
@@ -273,6 +282,7 @@ int main()
 	Action::GetInstance()->LoadFile(MOTION_FILE_PATH);
 	LinuxCM730 linux_cm730("/dev/ttyUSB0");
 	CM730 cm730(&linux_cm730);
+	
 	int init_attempt = 0;
 	int const init_attempt_max = 10;
 	while(cm730.Connect() == false)
@@ -286,6 +296,7 @@ int main()
 	}
 	printf("Success to connect CM-730!\n");
 	cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
+	//if (cm730.ChangeBaud(576000)){printf("Baud Success");}
 
 	printf("Motion Init\n");
 	if(MotionManager::GetInstance()->Initialize(&cm730) == false)
@@ -311,9 +322,12 @@ int main()
 	Point2D ball_pos, red_pos, yellow_pos, blue_pos;
 	LinuxMotionTimer *motion_timer = new LinuxMotionTimer(MotionManager::GetInstance());
 	motion_timer->Start();
+	printf("SetEnableMotion\n");
 	MotionManager::GetInstance()->SetEnable(true);
-	printf("SetEnable\n");
+	usleep(8000);
+	printf("SetEnableAction\n");
 	Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+	usleep(8000);
         bool action_b = false;
 	action_b = Action::GetInstance()->Start(1);    /* Init(stand up) pose */
 	while(Action::GetInstance()->IsRunning() == true) usleep(8000);
@@ -354,59 +368,56 @@ int main()
 
 	httpd::ini = ini;
 
-	int* int_err;
-	while(Scan(&cm730)!=0)
-	{
-		if(Scan(&cm730)==20)
-		{
-			init_attempt = 0;
-			while(cm730.Connect() == false)
-			{
-				init_attempt++;
-				if(init_attempt > init_attempt_max)
-				{
-					printf("Fail to connect CM-730!\n");
-					return 0;
-				}
-			}
-		}
-	}    	
 	cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);
+	int err_cnt = 0;
+	int num = 0;
+	std::string line;
+	//if (cm730.SetBaud(500000)){printf("Baud Success");}
 	while(1)
 	{
+		
+		//printf("Requesting command...\n");
 		send(sockfd, "req_new", strlen("cmd_req"),0);
+		sleep(0.5);
+		//sendto(sockfd, "req_new", strlen("cmd_req"),0,( struct sockaddr *)&servaddr,len);
+		//printf("Receiving command...\n");
 		n = read(sockfd, (char *)buffer, MAXLINE);    		
-		//n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &cliaddr,&len); 
-		buffer[n] = '\0';
-		//printf("Client : %s\n", buffer);
-		if(cleanup != 0)
+		//n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &servaddr,&len); 	
+		//buffer[n] = '\0';
+		printf("Server: %s\n", buffer);
+		if(strcmp(buffer,"no_cmd") == 0)
 		{
-			printf("Cleanup\n");
-			send(sockfd, "clean_up", strlen("clean_up"),0);
-			close(sockfd);
-			exit(0);
+			memset(buffer,0,MAXLINE);
+			sleep(1);
+			if(Scan(&cm730)==0){
+				err_cnt++;}
+			else if (err_cnt == 5){
+				printf("CM730 Disconnected\n");
+				cm730.Connect();
+				err_cnt = 0;}
+			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);
+		}
+		else if(strcmp(buffer,"reset") == 0)
+		{
+			memset(buffer,0,MAXLINE);
+			read(sockfd, (char *)buffer, MAXLINE);
+			cm730.Connect();
 		}
 		else if(strcmp(buffer,"close") == 0)
 		{
 			printf("Script beendet\n");
 			return 0;
 		}
-		else if(strcmp(buffer,"hallo") == 0)
-		{
-			std::string line = buffer;
-			line = "\""+line+"\"";
-			std::system(("espeak -vde "+line).c_str());
-		}
 		else if(strcmp(buffer,"vision") == 0)
 		{	
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
+			memset(buffer,0,MAXLINE);
 			n = read(sockfd, (char *)buffer, MAXLINE); 
-			buffer[n] = '\0';
-			strcpy(buffer_tmp, buffer);
-			printf("Client : %s\n", buffer_tmp);
-			std::string line = buffer_tmp;
+			printf("Server: %s\n", buffer);
+			std::string line = buffer;
 			line = "\""+line+"\"";
 			std::system(("espeak -vde "+line).c_str());
+			memset(buffer,0,MAXLINE);
 			StatusCheck::m_cur_mode = VISION;
 			StatusCheck::Check(cm730);
 			int detected_color = 0;
@@ -414,19 +425,21 @@ int main()
 			{
 				vision(ball_finder,red_finder,blue_finder,yellow_finder,rgb_output, detected_color);
 			}
-			if(Scan(&cm730)==20)cm730.Connect();
+			if(Scan(&cm730)==0)cm730.Connect();
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);
 		}
 		else if(strcmp(buffer,"soccer") == 0)
 		{
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
+			memset(buffer,0,MAXLINE);
 			n = read(sockfd, (char *)buffer, MAXLINE); 
-			buffer[n] = '\0';
+			//buffer[n] = '\0';
 			strcpy(buffer_tmp, buffer);
-			printf("Client : %s\n", buffer_tmp);
+			printf("Server: %s\n", buffer_tmp);
 			std::string line = buffer_tmp;
 			line = "\""+line+"\"";
 			std::system(("espeak -vde "+line).c_str());
+			memset(buffer,0,MAXLINE);
 			StatusCheck::m_cur_mode = START;
 			while(1)
     			{
@@ -435,36 +448,73 @@ int main()
 				if(StatusCheck::m_soccer_sub_mode == SOCCER_END)
 				{
 					//printf("Soccer Ende \n");
-					//if(Scan(&cm730)==20)cm730.Connect();
+					if(Scan(&cm730)==0)cm730.Connect();
 					cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);
 					break;
 				}
 					
 			}
 		}
-		else if(strcmp(buffer,"no_cmd") == 0)
+		else if(strcmp(buffer,"17") == 0)
 		{
-			if(Scan(&cm730)==20)
-			{
-				printf("cm730 Disconnected \n");
-				cm730.Connect();
-				Scan(&cm730);
-			}
-			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);
+			memset(buffer,0,MAXLINE);
+			n = read(sockfd, (char *)buffer, MAXLINE);
+			std::string line = buffer;
+			line = "\""+line+"\"";
+			std::system(("espeak -vde "+line).c_str());
+			memset(buffer,0,MAXLINE);
+			Action::GetInstance()->Start(17);
+			while(Action::GetInstance()->IsRunning()) usleep(8*1000);
+		}
+		else if(strcmp(buffer,"237") == 0)
+		{
+			memset(buffer,0,MAXLINE);
+			n = read(sockfd, (char *)buffer, MAXLINE);
+			std::string line = buffer;
+			line = "\""+line+"\"";
+			std::system(("espeak -vde "+line).c_str());
+			memset(buffer,0,MAXLINE);
+			Action::GetInstance()->Start(15);
+			while(Action::GetInstance()->IsRunning()) usleep(8*1000);
+			Action::GetInstance()->Start(1);
+			while(Action::GetInstance()->IsRunning()) usleep(8*1000);
+			Action::GetInstance()->Start(15);
+			while(Action::GetInstance()->IsRunning()) usleep(8*1000);
+			//Action::GetInstance()->Start(1);
+			//while(Action::GetInstance()->IsRunning()) usleep(8*1000);
+			//Action::GetInstance()->Start(239);
+			//while(Action::GetInstance()->IsRunning()) usleep(8*1000);
+			Action::GetInstance()->Start(1);
+			while(Action::GetInstance()->IsRunning()) usleep(8*1000);
+			
 		}
 		else
 		{	
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
+			//usleep(1000);
 			strcpy(buffer_tmp, buffer);
+			//usleep(1000);
+			memset(buffer,0,MAXLINE);			
 			n = read(sockfd, (char *)buffer, MAXLINE); 
-			buffer[n] = '\0';
-			printf("Client : %s\n", buffer);
-			std::string line = buffer;
+			//usleep(1000);
+			//n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &servaddr,&len);
+			//buffer[n] = '\0';
+			//usleep(1000);
+			printf("Server: %s\n", buffer);
+			//usleep(1000);
+			line = buffer;
+			memset(buffer,0,MAXLINE);
+			//usleep(1000);
 			line = "\""+line+"\"";
+			//usleep(1000);
+			num = std::atoi(buffer_tmp);
+			linux_cm730.Sleep(200.0);
+			action_b = Action::GetInstance()->Start(num); 
+			memset(buffer_tmp,0,MAXLINE); 
 			LinuxActionScript::ScriptStart(buffer_tmp);
 			usleep(1000);
 			std::system(("espeak -vde "+line).c_str());
-			while(Action::GetInstance()->IsRunning()) usleep(8*1000);
+			while(Action::GetInstance()->IsRunning()) usleep(8*1000); 
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(0,255,0), 0);
 		}	    		  
 	}
