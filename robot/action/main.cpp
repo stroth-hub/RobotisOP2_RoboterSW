@@ -1,8 +1,8 @@
 /*
  * main.cpp
  *
- *  Created on: 2011. 1. 4.
- *      Author: robotis
+ *  Date: 02.06.2025
+ *      Author: Stefan Roth
  */
 
 #include <unistd.h>
@@ -28,7 +28,6 @@
 #include "LinuxCM730.h"
 #include "LinuxActionScript.h"
 #include "LinuxDARwIn.h"
-#include "soccer.h"
 
 #include <bits/stdc++.h> 
 #include <stdlib.h> 
@@ -221,16 +220,10 @@ void soccer(ColorFinder* ball_finder, BallTracker& tracker, mjpg_streamer* strea
 int main()
 {
 	printf("Init Main\n");
-	//signal(SIGABRT, &sighandler);
-    	//signal(SIGTERM, &sighandler);
-    	//signal(SIGQUIT, &sighandler);
-    	//signal(SIGINT, &sighandler);
-
 	printf("TCP Init\n");
    	int sockfd; 
     	char buffer[MAXLINE]; 
 	memset(buffer,0,MAXLINE);
-	//std::string buffer;
 	char buffer_tmp[MAXLINE];	
 	memset(buffer_tmp,0,MAXLINE);
     	struct sockaddr_in servaddr, cliaddr; 
@@ -243,9 +236,6 @@ int main()
         	perror("socket creation failed\n"); 
         	exit(EXIT_FAILURE); 
 	}
-    
-	// UDP
-	//sockfd = socket(AF_INET, SOCK_DGRAM, 0);
    
     	memset(&servaddr, 0, sizeof(servaddr)); 
     	memset(&cliaddr, 0, sizeof(cliaddr)); 
@@ -296,7 +286,6 @@ int main()
 	}
 	printf("Success to connect CM-730!\n");
 	cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
-	//if (cm730.ChangeBaud(576000)){printf("Baud Success");}
 
 	printf("Motion Init\n");
 	if(MotionManager::GetInstance()->Initialize(&cm730) == false)
@@ -326,7 +315,7 @@ int main()
 	MotionManager::GetInstance()->SetEnable(true);
 	usleep(8000);
 	printf("SetEnableAction\n");
-	Action::GetInstance()->m_Joint.SetEnableBody(true, true);
+	Action::GetInstance()->m_Joint.SetEnableBody(true, true); //Problem
 	usleep(8000);
         bool action_b = false;
 	action_b = Action::GetInstance()->Start(1);    /* Init(stand up) pose */
@@ -375,15 +364,32 @@ int main()
 	//if (cm730.SetBaud(500000)){printf("Baud Success");}
 	while(1)
 	{
-		
-		//printf("Requesting command...\n");
-		send(sockfd, "req_new", strlen("cmd_req"),0);
+		if (send(sockfd, "req_new", strlen("cmd_req"),0)==-1)
+		{
+			printf("Fail to send\n");
+			close(sockfd); // closing socket, necessary to reconnect
+			sockfd = socket(AF_INET, SOCK_STREAM, 0); // create new socket
+			bind(sockfd, (const struct sockaddr *)&cliaddr, sizeof(servaddr)); //bind new socket
+			printf("Reconnecting...\n");
+			connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)); //reconnect
+			printf("Reconnected\n");
+			send(sockfd, "req_new", strlen("cmd_req"),0);
+		}
 		sleep(0.5);
 		//sendto(sockfd, "req_new", strlen("cmd_req"),0,( struct sockaddr *)&servaddr,len);
 		//printf("Receiving command...\n");
-		n = read(sockfd, (char *)buffer, MAXLINE);    		
-		//n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &servaddr,&len); 	
-		//buffer[n] = '\0';
+		if (read(sockfd, (char *)buffer, MAXLINE) == -1)
+		{
+			printf("Fail to read\n");
+			close(sockfd); // closing socket, necessary to reconnect
+			sockfd = socket(AF_INET, SOCK_STREAM, 0); // create new socket
+			bind(sockfd, (const struct sockaddr *)&cliaddr, sizeof(servaddr)); //bind new socket
+			printf("Reconnecting...\n");
+			connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)); //reconnect
+			printf("Reconnected\n");
+			read(sockfd, (char *)buffer, MAXLINE);
+		}   		
+
 		printf("Server: %s\n", buffer);
 		if(strcmp(buffer,"no_cmd") == 0)
 		{
@@ -491,23 +497,14 @@ int main()
 		else
 		{	
 			cm730.WriteWord(CM730::P_LED_HEAD_L, cm730.MakeColor(255,125,0), 0);
-			//usleep(1000);
 			strcpy(buffer_tmp, buffer);
-			//usleep(1000);
 			memset(buffer,0,MAXLINE);			
 			n = read(sockfd, (char *)buffer, MAXLINE); 
-			//usleep(1000);
-			//n = recvfrom(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL, ( struct sockaddr *) &servaddr,&len);
-			//buffer[n] = '\0';
-			//usleep(1000);
 			printf("Server: %s\n", buffer);
-			//usleep(1000);
 			line = buffer;
 			memset(buffer,0,MAXLINE);
-			//usleep(1000);
 			line = "\""+line+"\"";
-			//usleep(1000);
-			num = std::atoi(buffer_tmp);
+				num = std::atoi(buffer_tmp);
 			linux_cm730.Sleep(200.0);
 			action_b = Action::GetInstance()->Start(num); 
 			memset(buffer_tmp,0,MAXLINE); 
